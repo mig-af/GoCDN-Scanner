@@ -92,18 +92,20 @@ func CheckAllSubdomain(cdnList *[]IPs.Cdn , dominio string, savefile bool){
 					respCrt <- crt
 					fmt.Printf("\r%s", ".......ok.......")
 					ok = true
+					
 					break
 				}
 			}
 			
-			if(ok == false){
+			if(!ok){
 				fmt.Printf("\rcrt.sh > %s", err.Error())
 				time.Sleep(1 * time.Second)
 				respCrt <- domain.SubDomains{}
-
+				
 			}
 			
 		}()
+	
 		crt = <- respCrt
 		
 	}
@@ -151,7 +153,7 @@ func CheckAllSubdomain(cdnList *[]IPs.Cdn , dominio string, savefile bool){
 	
 	start := time.Now()
 	//fmt.Print("\n")
-	fmt.Printf("\r%s", "Starting:....................")
+	fmt.Printf("\r%s", "Starting:.....................")
 	
 	
 	//-----UNIENDO LISTAS DE SUBDOMINIOS-------
@@ -164,10 +166,10 @@ func CheckAllSubdomain(cdnList *[]IPs.Cdn , dominio string, savefile bool){
 
 	
 	//Dominio padre
-	dominioPadre := domain.Domain{Name: dominio, Ip: func()[]net.IP{ r, _ := funcs.CheckIp(dominio, true, Resolver);return r}()}
-	dominioPadre.FindCdn(cdnList)
+	dominioPrincipal := domain.Domain{Name: dominio, Ip: func()[]net.IP{ r, _ := funcs.CheckIp(dominio, true, Resolver);return *r}()}
+	dominioPrincipal.FindCdn(cdnList)
 
-	subdomains = append(subdomains, dominioPadre)
+	subdomains = append(subdomains, dominioPrincipal)
 	
 
 
@@ -225,7 +227,7 @@ func Start(lista []string, cdnlist *[]IPs.Cdn)[]domain.Domain{
 						dmain <- nil
 						continue
 					}
-					domaiin := &domain.Domain{Name: x, Ip: ip }
+					domaiin := &domain.Domain{Name: x, Ip: *ip }
 					domaiin.FindCdn(cdnlist)
 					//subdomains = append(subdomains, domaiin)
 					dmain <- domaiin
@@ -254,7 +256,7 @@ func Start(lista []string, cdnlist *[]IPs.Cdn)[]domain.Domain{
 
 	for _, x := range lista{
 		ip, _ := funcs.CheckIp(x, true, Resolver)
-		domaiin := domain.Domain{Name: x, Ip: ip }
+		domaiin := domain.Domain{Name: x, Ip: *ip }
 		domaiin.FindCdn(cdnlist)
 		subdomains = append(subdomains, domaiin)
 

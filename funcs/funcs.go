@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"gatoscanner/config"
-	"math/rand"
+	//"math/rand"
 	"net"
 	"os"
-	"time"
+	//"time"
 )
 
 //---------------
@@ -46,12 +46,12 @@ func elementInList(list []string, element string)bool{
 //------------------
 
 
-func CheckIp(url string, onlyIpv4 bool, resolver *net.Resolver)([]net.IP, error){
+func CheckIp(url string, onlyIpv4 bool, resolver *net.Resolver)(*[]net.IP, error){
 	var (
 		resp []net.IP
 		err error
 	)
-
+	
 	if(config.Android){
 		resp, err = resolver.LookupIP(context.Background(), "ip", url)
 
@@ -60,9 +60,9 @@ func CheckIp(url string, onlyIpv4 bool, resolver *net.Resolver)([]net.IP, error)
 
 	}
 	if(err != nil){
-		time.Sleep(time.Duration(rand.Intn(100)) * time.Millisecond)
+		//time.Sleep(time.Duration(rand.Intn(100)) * time.Millisecond)
 		// fmt.Printf("\r %s", err.Error())
-		return []net.IP{}, err
+		return &[]net.IP{}, err
 	}
 	if(onlyIpv4){
 		
@@ -74,10 +74,10 @@ func CheckIp(url string, onlyIpv4 bool, resolver *net.Resolver)([]net.IP, error)
 				ipv4s = append(ipv4s, resp[i])
 			}
 		}
-		return ipv4s, nil
+		return &ipv4s, nil
 	}
 
-	return resp, nil
+	return &resp, nil
 }
 
 

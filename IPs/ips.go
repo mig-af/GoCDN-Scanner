@@ -183,7 +183,7 @@ func (i *IpRanges)Load(){
 	google :=  &Google{Name:"google"}
 	ipgoo, _ := File.ReadFile("IPfiles/google.txt")
 	google.IpRange = strings.Fields(string(ipgoo))
-	// google.IpRange =i.getIpsFromFile( google.GetName() + ".txt")
+	//google.IpRange =i.getIpsFromFile( google.GetName() + ".txt")
 
 	bunnycdn := &BunnyCdn{Name: "bunnycdn"}
 	bunnycdn.IpRange = bunnycdn.LoadIPsFromAPIBunny() 

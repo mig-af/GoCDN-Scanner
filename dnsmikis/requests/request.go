@@ -13,6 +13,9 @@ import (
 var Dialer *net.Dialer = config.ConfigDialerAndResolver()
 
 
+
+const TIMEOUT int16 = 60
+
 func Get(url string)(*http.Response, error){
 	UserAgent := GetRandomUa()
 	var client *http.Client
@@ -21,7 +24,7 @@ func Get(url string)(*http.Response, error){
 	if(config.Android ){
 	
 		client = &http.Client{
-			Timeout: 50 * time.Second,
+			Timeout: time.Duration(TIMEOUT) * time.Second,
 			Transport: &http.Transport{
 				DialContext: Dialer.DialContext,
 			},
