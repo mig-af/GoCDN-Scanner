@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"gatoscanner/IPs"
 	"gatoscanner/config"
-	"gatoscanner/dnsmikis"
-	"gatoscanner/dnsmikis/cert"
-	"gatoscanner/dnsmikis/hacktarget"
-	"gatoscanner/dnsmikis/rapiddns"
-	"gatoscanner/dnsmikis/urlscan"
-	"gatoscanner/dnsmikis/robtex"
+	"gatoscanner/sources"
+	"gatoscanner/sources/cert"
+	"gatoscanner/sources/hacktarget"
+	"gatoscanner/sources/rapiddns"
+	"gatoscanner/sources/urlscan"
+	"gatoscanner/sources/robtex"
 	"gatoscanner/domain"
 	"gatoscanner/funcs"
 	"gatoscanner/style"
@@ -72,7 +72,8 @@ func CheckAllSubdomain(cdnList *[]IPs.Cdn , dominio string, savefile bool){
 	
 
 	
-
+	//----------------------Services-------------------------------------
+	var subDomainsStrings []string
 
 	//-----------------CRT.SH--------------------------------
 	crtSh := &cert.CrtSh{NameService:"crt.sh", Domain:dominio, Url: urlCrt}
@@ -110,72 +111,56 @@ func CheckAllSubdomain(cdnList *[]IPs.Cdn , dominio string, savefile bool){
 		
 	}
 
+	subDomainsStrings = append(subDomainsStrings, crt.SubDomains...)
+	
 
 	//--------------ROBTEX.COM------------------------
 	rbt := &robtex.Robtext{NameService: "robtext.com", Domain: dominio, Url:urlRobtex}
-	robtex, errRob := ScanSubdomain(rbt)
-	if(errRob != nil){
-		fmt.Printf("\r%s", errRob)
-		robtex = domain.SubDomains{}
-	}
-
-
-	
 	//-----------------HACKERTARGET.COM----------------------------------------
 	hackTarget := &hacktarget.Htarget{NameService:"hackertarget", Domain: dominio, Url: urlHtarget}
-	ht, errt := ScanSubdomain(hackTarget)
-	if(errt != nil){
-		fmt.Printf("htarget> No work %s",errt.Error())
-		ht = domain.SubDomains{}
-	}
-
 	//-------------------URLSCAN.IO-----------------------------------------
-
 	scanIo := &urlscan.UrlScan{NameService: "urlscan.io", Domain: dominio, Url: urlUrlScanio}
-	sci, errs := ScanSubdomain(scanIo)
-	if(errs != nil){
-		fmt.Printf("urlscan > No work %s", errs.Error())
-		sci = domain.SubDomains{}
-	}
-
 	//----------------RAPIDDNS.COM------------------------------------------
-
 	rapid := &rapiddns.RapidDns{NameService: "rapiddns", Domain: dominio, Url: urlRapidDns}
-	rapidns, errp := ScanSubdomain(rapid)
-	if(errp != nil){
-		fmt.Printf("RpDns > No work %s", errp.Error())
-		rapidns = domain.SubDomains{}
+	
+	
+	services := []sources.Scan{
+		rbt,
+		hackTarget,
+		scanIo,
+		rapid,
 	}
-	//-----------------------------------------------------------
+	for _ , service := range services{
+		serv, err := ScanSubdomain(service)
+		if(err != nil){
+			fmt.Printf("\n%s", err.Error())
+			serv = domain.SubDomains{}
+		}
+		subDomainsStrings = append(subDomainsStrings, serv.SubDomains...)
+	}
 
-	//-----INICIO LISTA DE struct DOMINIOS (SUBDOMINIOS)
+	//----limpiar duplicados
+	listClean := funcs.DeleteRepeat(subDomainsStrings)
+	
+
+	//-----INICIO LISTA  DOMINIOS (SUBDOMINIOS)
 	var subdomains []domain.Domain
 	
 	start := time.Now()
-	//fmt.Print("\n")
 	fmt.Printf("\r%s", "Starting:.....................")
 	
-	
-	//-----UNIENDO LISTAS DE SUBDOMINIOS-------
-	subdomainsStrings := append(crt.SubDomains, ht.SubDomains...)
-	subdomainsStrings = append(subdomainsStrings, sci.SubDomains...)
-	subdomainsStrings = append(subdomainsStrings, rapidns.SubDomains...)
-	subdomainsStrings = append(subdomainsStrings, robtex.SubDomains...)
-	listClean := funcs.DeleteRepeat(subdomainsStrings)
-	
 
 	
-	//Dominio padre
+	//Dominio principal
 	dominioPrincipal := domain.Domain{Name: dominio, Ip: func()[]net.IP{ r, _ := funcs.CheckIp(dominio, true, Resolver);return *r}()}
 	dominioPrincipal.FindCdn(cdnList)
-
 	subdomains = append(subdomains, dominioPrincipal)
 	
 
 
 	//------ INICIO ----
-	subdomains = Start(listClean, cdnList)
-
+	listdomains := Start(listClean, cdnList)
+	subdomains = append(subdomains, listdomains...)
 
 	//----guardar si es requerido---------
 	if(savefile){
@@ -270,7 +255,7 @@ func Start(lista []string, cdnlist *[]IPs.Cdn)[]domain.Domain{
 
 
 // ------PARA PROBAR LA INTERFACE :| 
-func ScanSubdomain(s dnsmikis.Scan)(domain.SubDomains, error){
+func ScanSubdomain(s sources.Scan)(domain.SubDomains, error){
 
 	resp, err := s.CheckSubdomain()
 	if(err != nil){
@@ -288,7 +273,11 @@ func ScanSubdomain(s dnsmikis.Scan)(domain.SubDomains, error){
 func Help()string{
 	return `
 Help:
-Use: ./recondomain [options] <arguments>
+Use: 
+    ./gocdn [options] <arguments>
+Android:
+    ./gocdn-android [options] <arguments>
+
 Options:
   --cdn <IP>            "Scann all CDN for this ip"
   --subdomain <DOMAIN>  "Scann all CDN and Subdomains for this domain"	
@@ -296,9 +285,10 @@ Options:
   [--save] [-s]         "Save results in a file (./subdomains-your-domain.txt)" 
 
 Example:
-  ./recondomain --cdn  123.123.123.123
-  ./recondomain --subdomain  mydomain.com
-  ./recondomain --subdomain mydomain.com --save 
+  ./gocdn --cdn  123.123.123.123
+  ./gocdn --subdomain  mydomain.com
+  ./gocdn --subdomain mydomain.com --save 
+
 `
 }
 

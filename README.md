@@ -29,16 +29,16 @@ Precompiled binaries available for Linux and Android (Termux).
 
 **Linux**
 ```bash
-wget https://github.com/mig-af/ReconDomain/raw/refs/heads/main/recondomain
-chmod +x recondomain
-./recondomain 
+wget https://github.com/mig-af/GoCDN-Scanner/raw/refs/heads/main/gocdn
+chmod +x gocdn
+./gocdn
 ```
 
 **Android (Termux)**
 ```bash
-wget https://github.com/mig-af/ReconDomain/raw/refs/heads/main/recondomain-android 
-chmod +x recondomain-android
-./recondomain-android 
+wget https://github.com/mig-af/GoCDN-Scanner/raw/refs/heads/main/gocdn-android 
+chmod +x gocdn-android
+./gocdn-android 
 ```
 
 ---
@@ -46,7 +46,7 @@ chmod +x recondomain-android
 ## Usage
 
 ```
-recondomain [options] <arguments>
+gocdn [options] <arguments>
 
 Options:
   --cdn <IP>          Scan all CDNs for a given IP
@@ -57,9 +57,9 @@ Options:
 
 **Examples**
 ```bash
-./recondomain --cdn 123.123.123.123
-./recondomain --subdomain mydomain.com
-./recondomain --subdomain mydomain.net --save
+./gocdn --cdn 123.123.123.123
+./gocdn --subdomain mydomain.com
+./gocdn --subdomain mydomain.net --save
 ```
 
 ---

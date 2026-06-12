@@ -25,7 +25,7 @@ func main(){
 	option := os.Args
 	if(len(option) < 2){
 		
-		fmt.Println("Invalid option, please type ./recondomain --help")
+		fmt.Println(config.ErrorMessage())
 		fmt.Println()
 
 		return
@@ -47,7 +47,7 @@ func main(){
 		
 		if(len(option) < 3){
 			fmt.Println()
-			fmt.Println("Invalid <argument>, please type --help")
+			fmt.Println(config.ErrorMessage())
 			fmt.Println()
 			return
 		}
@@ -57,7 +57,7 @@ func main(){
 	case "--subdomain":
 		if(len(option) < 3){
 			fmt.Println()
-			fmt.Println("Invalid <argument>, please type --help")
+			fmt.Println(config.ErrorMessage())
 			fmt.Println()
 			return
 		}
@@ -68,7 +68,7 @@ func main(){
 		
 
 	default:
-		fmt.Println("Invalid option, please type ./recondomain --help")
+		fmt.Println(config.ErrorMessage())
 		fmt.Println()
 	}
 
