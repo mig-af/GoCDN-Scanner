@@ -150,18 +150,10 @@ func CheckAllSubdomain(cdnList *[]IPs.Cdn , dominio string, savefile bool){
 	fmt.Printf("\r%s", "Starting:.....................")
 	
 
-	
-	//Dominio principal
-	dominioPrincipal := domain.Domain{Name: dominio, Ip: func()[]net.IP{ r, _ := funcs.CheckIp(dominio, true, Resolver);return *r}()}
-	dominioPrincipal.FindCdn(cdnList)
-	subdomains = append(subdomains, dominioPrincipal)
-	
-
 
 	//------ INICIO ----
-	listdomains := Start(listClean, cdnList)
-	subdomains = append(subdomains, listdomains...)
-
+	subdomains = Start(listClean, cdnList)
+	
 	//----guardar si es requerido---------
 	if(savefile){
 		var data string
@@ -173,6 +165,8 @@ func CheckAllSubdomain(cdnList *[]IPs.Cdn , dominio string, savefile bool){
 	
 	//-------RESULTADOS
 	fmt.Printf("\r%s","---------------------------Results-------------------------------\n")
+	fmt.Println("Domain: ", dominio)
+	fmt.Println("-----------------------------------------------------------------")
 	for n, v := range subdomains{
 		time.Sleep(100 * time.Millisecond)
 		fmt.Println(n+1,style.YELLOW, v.Name, style.END ,style.GREEN, v.Ip, style.END) 
