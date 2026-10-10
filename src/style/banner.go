@@ -5,7 +5,7 @@ import "fmt"
 
 
 
-const AUTOR string = "@COLTJJ"
+const AUTOR string = "@MlGUELf"
 
 
 var Banner2 string = fmt.Sprintf(`%s                                                                      
